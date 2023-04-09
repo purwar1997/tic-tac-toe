@@ -75,6 +75,7 @@ export default function App() {
       <div className="grid grid-cols-3 gap-3">
         {items.map((item, index) => (
           <div
+            key={index}
             className="h-24 w-32 rounded-lg bg-white text-black flex items-center justify-center cursor-pointer"
             onClick={() => changeItems(index)}
           >
