@@ -3,6 +3,7 @@ import Icon from './components/Icon';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './Toast.css';
 
 export default function App() {
   const [items, setItems] = useState(new Array(9).fill('empty'));
@@ -43,7 +44,7 @@ export default function App() {
   }
 
   if (!noWinnerMessage) {
-    if (!winningMessage && !items.includes('empty')) {
+    if (!items.includes('empty') && !winningMessage) {
       setNoWinnerMessage('No one wins the game');
     }
   }
@@ -59,20 +60,23 @@ export default function App() {
     <>
       <ToastContainer
         position="bottom-center"
-        autoClose={1000}
+        autoClose={1500}
         hideProgressBar={true}
         theme="dark"
+        toastClassName="toastBody"
       />
 
-      {winningMessage ? <p className="text-4xl text-white font-normal">{winningMessage}</p> : ''}
-      {noWinnerMessage ? <p className="text-4xl text-white font-normal">{noWinnerMessage}</p> : ''}
+      {winningMessage || noWinnerMessage ? (
+        <p className="text-4xl text-white font-normal">{winningMessage || noWinnerMessage}</p>
+      ) : (
+        ''
+      )}
 
       <div className="grid grid-cols-3 gap-3">
         {items.map((item, index) => (
           <div
             className="h-24 w-32 rounded-lg bg-white text-black flex items-center justify-center cursor-pointer"
             onClick={() => changeItems(index)}
-            disabled={winningMessage || noWinnerMessage ? true : false}
           >
             <Icon item={item} />
           </div>
