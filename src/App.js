@@ -10,7 +10,7 @@ export default function App() {
   const [winningMessage, setWinningMessage] = useState('');
   const [noWinnerMessage, setNoWinnerMessage] = useState('');
 
-  let isWinner = false;
+  let winnerExists = false;
 
   function changeItems(index) {
     if (winningMessage) {
@@ -56,15 +56,15 @@ export default function App() {
       (items[2] !== 'empty' && items[2] === items[4] && items[4] === items[6])
     ) {
       setWinningMessage(`${isCross ? 'Circle' : 'Cross'} wins the game`);
-      isWinner = true;
+      winnerExists = true;
     }
   }, [items, isCross]);
 
   useEffect(() => {
-    if (!items.includes('empty') && !isWinner) {
+    if (!items.includes('empty') && !winnerExists) {
       setNoWinnerMessage('No one wins the game');
     }
-  }, [items, isWinner]);
+  }, [items, winnerExists]);
 
   return (
     <>
