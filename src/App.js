@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icon from './components/Icon';
-
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Toast.css';
@@ -11,42 +10,31 @@ export default function App() {
   const [winningMessage, setWinningMessage] = useState('');
   const [noWinnerMessage, setNoWinnerMessage] = useState('');
 
+  let isWinner = false;
+
   function changeItems(index) {
     if (winningMessage) {
-      toast.info(`${isCross ? 'Circle' : 'Cross'} has already won the game`);
-    } else if (noWinnerMessage) {
-      toast.info('Click play again button to reload the game');
-    } else {
-      if (items[index] === 'empty') {
-        items[index] = isCross ? 'cross' : 'circle';
-        setIsCross(!isCross);
+      return toast.info(`${isCross ? 'Circle' : 'Cross'} has already won the game`);
+    }
+
+    if (noWinnerMessage) {
+      return toast.info('Click play again button to reload the game');
+    }
+
+    if (items[index] !== 'empty') {
+      return toast.info("Item once set can't be changed");
+    }
+
+    const newItems = items.map((item, itemIndex) => {
+      if (itemIndex === index) {
+        return isCross ? 'cross' : 'circle';
       } else {
-        toast.error("Item once set can't be changed");
+        return item;
       }
-    }
-  }
+    });
 
-  if (!winningMessage) {
-    if (items.filter(item => item !== 'empty').length > 4) {
-      if (
-        (items[0] !== 'empty' && items[0] === items[1] && items[1] === items[2]) ||
-        (items[3] !== 'empty' && items[3] === items[4] && items[4] === items[5]) ||
-        (items[6] !== 'empty' && items[6] === items[7] && items[7] === items[8]) ||
-        (items[0] !== 'empty' && items[0] === items[3] && items[3] === items[6]) ||
-        (items[1] !== 'empty' && items[1] === items[4] && items[4] === items[7]) ||
-        (items[2] !== 'empty' && items[2] === items[5] && items[5] === items[8]) ||
-        (items[0] !== 'empty' && items[0] === items[4] && items[4] === items[8]) ||
-        (items[2] !== 'empty' && items[2] === items[4] && items[4] === items[6])
-      ) {
-        setWinningMessage(`${isCross ? 'Circle' : 'Cross'} wins the game`);
-      }
-    }
-  }
-
-  if (!noWinnerMessage) {
-    if (!items.includes('empty') && !winningMessage) {
-      setNoWinnerMessage('No one wins the game');
-    }
+    setItems(newItems);
+    setIsCross(!isCross);
   }
 
   function reloadGame() {
@@ -55,6 +43,28 @@ export default function App() {
     setWinningMessage('');
     setNoWinnerMessage('');
   }
+
+  useEffect(() => {
+    if (
+      (items[0] !== 'empty' && items[0] === items[1] && items[1] === items[2]) ||
+      (items[3] !== 'empty' && items[3] === items[4] && items[4] === items[5]) ||
+      (items[6] !== 'empty' && items[6] === items[7] && items[7] === items[8]) ||
+      (items[0] !== 'empty' && items[0] === items[3] && items[3] === items[6]) ||
+      (items[1] !== 'empty' && items[1] === items[4] && items[4] === items[7]) ||
+      (items[2] !== 'empty' && items[2] === items[5] && items[5] === items[8]) ||
+      (items[0] !== 'empty' && items[0] === items[4] && items[4] === items[8]) ||
+      (items[2] !== 'empty' && items[2] === items[4] && items[4] === items[6])
+    ) {
+      setWinningMessage(`${isCross ? 'Circle' : 'Cross'} wins the game`);
+      isWinner = true;
+    }
+  }, [items, isCross]);
+
+  useEffect(() => {
+    if (!items.includes('empty') && !isWinner) {
+      setNoWinnerMessage('No one wins the game');
+    }
+  }, [items, isWinner]);
 
   return (
     <>
@@ -65,35 +75,32 @@ export default function App() {
         theme="dark"
         toastClassName="toastBody"
       />
+      <div className="h-screen flex flex-col items-center justify-center gap-12">
+        {(winningMessage || noWinnerMessage) && (
+          <p className="text-4xl text-white font-normal">{winningMessage || noWinnerMessage}</p>
+        )}
 
-      {winningMessage || noWinnerMessage ? (
-        <p className="text-4xl text-white font-normal">{winningMessage || noWinnerMessage}</p>
-      ) : (
-        ''
-      )}
+        <div className="grid grid-cols-3 gap-3">
+          {items.map((item, index) => (
+            <div
+              className="h-24 w-32 rounded-lg bg-white text-black flex items-center justify-center cursor-pointer"
+              key={index}
+              onClick={() => changeItems(index)}
+            >
+              <Icon item={item} />
+            </div>
+          ))}
+        </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {items.map((item, index) => (
-          <div
-            key={index}
-            className="h-24 w-32 rounded-lg bg-white text-black flex items-center justify-center cursor-pointer"
-            onClick={() => changeItems(index)}
+        {(winningMessage || noWinnerMessage) && (
+          <button
+            className="bg-[#218838] text-white rounded px-5 py-2 cursor-pointer transition-opacity hover:opacity-90"
+            onClick={reloadGame}
           >
-            <Icon item={item} />
-          </div>
-        ))}
+            Play Again
+          </button>
+        )}
       </div>
-
-      {winningMessage || noWinnerMessage ? (
-        <button
-          className="bg-[#218838] text-white  rounded px-5 py-2 cursor-pointer transition-opacity hover:opacity-90"
-          onClick={reloadGame}
-        >
-          Play Again
-        </button>
-      ) : (
-        ''
-      )}
     </>
   );
 }
