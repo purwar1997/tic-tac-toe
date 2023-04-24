@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Icon from './components/Icon';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -37,14 +37,7 @@ export default function App() {
     setIsCross(!isCross);
   }
 
-  function reloadGame() {
-    setItems(new Array(9).fill('empty'));
-    setIsCross(true);
-    setWinningMessage('');
-    setNoWinnerMessage('');
-  }
-
-  useEffect(() => {
+  if (!winningMessage) {
     if (
       (items[0] !== 'empty' && items[0] === items[1] && items[1] === items[2]) ||
       (items[3] !== 'empty' && items[3] === items[4] && items[4] === items[5]) ||
@@ -58,13 +51,20 @@ export default function App() {
       setWinningMessage(`${isCross ? 'Circle' : 'Cross'} wins the game`);
       winnerExists = true;
     }
-  }, [items, isCross]);
+  }
 
-  useEffect(() => {
+  if (!noWinnerMessage) {
     if (!items.includes('empty') && !winnerExists) {
       setNoWinnerMessage('No one wins the game');
     }
-  }, [items, winnerExists]);
+  }
+
+  function reloadGame() {
+    setItems(new Array(9).fill('empty'));
+    setIsCross(true);
+    setWinningMessage('');
+    setNoWinnerMessage('');
+  }
 
   return (
     <>
